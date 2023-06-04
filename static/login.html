@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="loginForm">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Get form input values
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+
+      // Create JSON object
+      var data = {
+        email: email,
+        password: password
+      };
+
+      // Send JSON data to the server
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        // Handle the response from the server
+        console.log(result);
+
+        // Extract the token from the response
+        var token = result.token;
+
+        // Set the token in the request header
+        var headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        };
+
+        // Example: Make another request with the token in the header
+        fetch('/users', {
+          headers: headers
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          // Process the protected data
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+      })
+      .catch(error => {
+        // Handle any errors that occur during the request
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
